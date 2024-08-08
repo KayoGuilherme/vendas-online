@@ -1,0 +1,42 @@
+doctype html
+html
+  head
+    style.
+      .container {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        text-align: center;
+        
+      }
+      .header {
+        font-size: 24px;
+        font-weight: bold;
+        color: #4CAF50;
+      }
+      .subheader {
+        font-size: 18px;
+        color: #333333;
+      }
+      .content {
+        font-size: 16px;
+        margin-top: 10px;
+      }
+      .tracking-code {
+        font-size: 18px;
+        font-weight: bold;
+        color: #0000ff;
+        margin-top: 20px;
+      }
+      .logo {
+        width: 145px;
+        margin: 20px auto;
+        
+      }
+  body
+    .container
+      img.logo(src=logo alt='Logo da Empresa')
+      .header Olá, #{name}
+      .subheader Obrigado por comprar os Produtos da Ecogreen Cosméticos!
+      .content Produto de Compra: #{productName}
+      .content A seguir está o seu código de rastreio para acompanhar o pedido:
+      .tracking-code #{trackingCode}

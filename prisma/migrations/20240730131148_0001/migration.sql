@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Adress" ALTER COLUMN "numero" SET DATA TYPE TEXT;
