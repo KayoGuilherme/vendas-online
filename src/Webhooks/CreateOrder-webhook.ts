@@ -47,6 +47,8 @@ export class WebhookController {
           adressId: Number(session.metadata.adressId),
         };
 
+        console.log(data);
+
         if (!data.userId || !data.cart_Id || !data.adressId) {
           throw new NotFoundException('Dados nao econtrados');
         }
