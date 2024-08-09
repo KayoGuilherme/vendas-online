@@ -43,7 +43,7 @@ export class PaymentService {
       customer_creation: 'if_required',
       metadata: {
         userId,
-        adressId: selectedAdressId ,
+        adressId: Number(selectedAdressId) ,
         cartId: (await cart).id,
         productPrices: JSON.stringify(
           produtos.map((item) => ({

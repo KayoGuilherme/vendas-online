@@ -1,5 +1,6 @@
 import {
   Controller,
+  Param,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -18,11 +19,11 @@ export class PaymentController {
 
   constructor(
     private readonly paymentService: PaymentService,
-  ) {}
+  ) { }
 
   @UseGuards(AuthGuard)
   @Post('create-checkout-session')
-  async createCheckoutSession(@User() userId: number, selectedAdressId: number) {
+  async createCheckoutSession(@User() userId: number, @Param("selectedAdressId") selectedAdressId: number) {
     const session = await this.paymentService.createCheckoutSession(userId, selectedAdressId);
     return {
       url: session.url,
