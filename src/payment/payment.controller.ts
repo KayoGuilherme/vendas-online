@@ -23,7 +23,7 @@ export class PaymentController {
   ) { }
 
   @UseGuards(AuthGuard)
-  @Post('create-checkout-session')
+  @Post('create-checkout-session/:selectedAdressId')
   async createCheckoutSession(@User() userId: number, @ParamAddresId() selectedAdressId: number) {
     const session = await this.paymentService.createCheckoutSession(userId, selectedAdressId);
     return {
