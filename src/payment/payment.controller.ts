@@ -9,6 +9,7 @@ import { User } from '../decorators/user.decorator';
 import { AuthGuard } from '../guards/auth.guard';
 import Stripe from 'stripe';
 import { ApiTags } from '@nestjs/swagger';
+import { ParamAddresId } from 'src/decorators/selectAddres-id.decorator';
 
 @ApiTags('Controle de Pagamento')
 @Controller('payments')
@@ -23,7 +24,7 @@ export class PaymentController {
 
   @UseGuards(AuthGuard)
   @Post('create-checkout-session')
-  async createCheckoutSession(@User() userId: number, @Param("selectedAdressId") selectedAdressId: number) {
+  async createCheckoutSession(@User() userId: number, @ParamAddresId() selectedAdressId: number) {
     const session = await this.paymentService.createCheckoutSession(userId, selectedAdressId);
     return {
       url: session.url,
