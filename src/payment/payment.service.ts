@@ -12,7 +12,7 @@ export class PaymentService {
     });
   }
 
-  async createCheckoutSession(userId: number, selectedAdressId: number) {
+  async createCheckoutSession(userId: number, selectedAdressId: string) {
     const cart = this.cartService.findCartByUserId(userId);
     const produtos = (await cart).carrinho;
 
