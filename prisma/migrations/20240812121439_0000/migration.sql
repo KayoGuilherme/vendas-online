@@ -85,7 +85,7 @@ CREATE TABLE "Order" (
 CREATE TABLE "Adress" (
     "id" SERIAL NOT NULL,
     "CEP" TEXT NOT NULL,
-    "numero" INTEGER,
+    "numero" TEXT,
     "complemento" TEXT NOT NULL,
     "ponto_de_referencia" TEXT NOT NULL,
     "bairro" TEXT NOT NULL,
