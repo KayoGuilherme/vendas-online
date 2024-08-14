@@ -23,6 +23,7 @@ import { Roles } from '../decorators/role.decorator';
 import { Role } from '../enums/role.enum';
 import { Paramid } from '../decorators/param-id.decorator';
 import { ParamId_produto } from '../decorators/param-id_produto.decorator';
+import { ParamProdutoId } from '../decorators/param-produtoId.decorator';
 
 @UseGuards(AuthGuard)
 @Controller('Product')
