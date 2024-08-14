@@ -164,13 +164,13 @@ export class ProductService {
     }
   }
 
-  async updateStock(productId: number, quantity: number) {
+  async updateStock(id_produto: number, quantity: number) {
     
     if (quantity <= 0) {
       throw new BadRequestException('Quantidade deve ser positiva');
     }
     return this.prisma.produtos.update({
-      where: { id_produto: Number(productId) },
+      where: { id_produto: Number(id_produto) },
       data: {
         estoque: {
           decrement: quantity,

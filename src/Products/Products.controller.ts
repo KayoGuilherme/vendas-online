@@ -90,8 +90,8 @@ export class ProductController {
 
   @UseGuards(RoleGuard)
   @Roles(Role.Admin)
-  @Patch(":productId")
-  async updateStock(@ParamProdutoId() productId: number, @Body() quantity: number ){
-    return this.ProductService.updateStock(productId, quantity)
+  @Patch(":id_produto")
+  async updateStock(@ParamProdutoId() id_produto: number, @Body() quantity: number ){
+    return this.ProductService.updateStock(id_produto, quantity)
   }
 }
