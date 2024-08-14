@@ -48,7 +48,8 @@
     "rxjs": "^7.8.1",
     "strip-ansi": "^7.1.0",
     "stripe": "^14.17.0",
-    "swagger-ui-dist": "^5.11.0"
+    "swagger-ui-dist": "^5.11.0",
+    "yarn": "^1.22.22"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

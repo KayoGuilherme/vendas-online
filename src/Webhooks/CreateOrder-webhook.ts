@@ -47,7 +47,6 @@ export class WebhookController {
           adressId: Number(session.metadata.adressId),
         };
 
-        console.log(data);
 
         if (!data.userId || !data.cart_Id || !data.adressId) {
           throw new NotFoundException('Dados nao econtrados');
@@ -82,13 +81,4 @@ export class WebhookController {
     }
   }
 
-
-    // const productPrices = JSON.parse(session.metadata.productPrices || '[]');
-
-    //     for (const item of productPrices) {
-    //       const productId = item.id; // Assumindo que `item.id` é o ID do produto
-    //       const quantity = item.amount;
-
-    //    
-    //       await this.stockService.updateStock(productId, quantity);
 }

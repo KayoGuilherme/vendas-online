@@ -17,15 +17,12 @@ export class PaymentService {
     const produtos = (await cart).carrinho;
 
     const line_items = produtos.map((item) => {
-      const imagemUrl = item.produtos.imagem.length > 0 ? item.produtos.imagem[0].url : null;
       return {
         price_data: {
           currency: 'brl',
           product_data: {
             name: item.produtos.nome_produto,
             description: item.produtos.descricao,
-            images: imagemUrl ? [imagemUrl] : [],
-          
           },
           unit_amount: item.produtos.preco * 100,
         },
