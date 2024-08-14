@@ -22,8 +22,7 @@ import { RoleGuard } from '../guards/role.guard';
 import { Roles } from '../decorators/role.decorator';
 import { Role } from '../enums/role.enum';
 import { Paramid } from '../decorators/param-id.decorator';
-import { ParamProdutoId } from '../decorators/param-produtoId.decorator';
-import { ParamId_produto } from 'src/decorators/param-id_produto.decorator';
+import { ParamId_produto } from '../decorators/param-id_produto.decorator';
 
 @UseGuards(AuthGuard)
 @Controller('Product')
