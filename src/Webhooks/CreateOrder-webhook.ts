@@ -5,6 +5,7 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
+import { ProductService } from 'src/Products/Products.service';
 import { PrismaService } from 'src/database/prisma.service';
 import Stripe from 'stripe';
 
@@ -12,7 +13,10 @@ import Stripe from 'stripe';
 export class WebhookController {
   private stripe: Stripe;
 
-  constructor(private readonly prisma: PrismaService) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly productService: ProductService
+    ) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
       apiVersion: '2023-10-16',
     });
@@ -58,6 +62,10 @@ export class WebhookController {
           totalProfit += item.price * item.amount;
         });
 
+        for (const item of productPrices) {
+          await this.productService.updateStock(item.productId, item.amount);
+        }
+
         if (isNaN(totalProfit) || totalProfit <= 0) {
           throw new BadRequestException('Lucro total inválido');
         }
@@ -72,6 +80,7 @@ export class WebhookController {
           data,
         });
       }
+
       return { sucess: true };
     } catch (e) {
       console.log(e);

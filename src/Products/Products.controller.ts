@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   UploadedFile,
@@ -84,5 +85,13 @@ export class ProductController {
   @Delete(':id')
   async deleteProduct(@Paramid() id_produto: number) {
     return this.ProductService.delete(id_produto);
+  }
+
+
+  @UseGuards(RoleGuard)
+  @Roles(Role.Admin)
+  @Patch(":productId")
+  async updateStock(@ParamProdutoId() productId: number, @Body() quantity: number ){
+    return this.ProductService.updateStock(productId, quantity)
   }
 }
