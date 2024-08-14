@@ -63,7 +63,7 @@ export class WebhookController {
         });
 
         for (const item of productPrices) {
-          await this.productService.updateStock(item.productId, item.amount);
+          await this.productService.updateStock(item.id_produto, item.amount);
         }
 
         if (isNaN(totalProfit) || totalProfit <= 0) {

@@ -23,6 +23,7 @@ import { Roles } from '../decorators/role.decorator';
 import { Role } from '../enums/role.enum';
 import { Paramid } from '../decorators/param-id.decorator';
 import { ParamProdutoId } from '../decorators/param-produtoId.decorator';
+import { ParamId_produto } from 'src/decorators/param-id_produto.decorator';
 
 @UseGuards(AuthGuard)
 @Controller('Product')
@@ -91,7 +92,7 @@ export class ProductController {
   @UseGuards(RoleGuard)
   @Roles(Role.Admin)
   @Patch(":id_produto")
-  async updateStock(@Param("id_produto") id_produto: number, @Body() quantity: number ){
+  async updateStock(@ParamId_produto() id_produto: number, @Body() quantity: number ){
     return this.ProductService.updateStock(Number(id_produto), quantity)
   }
 }
