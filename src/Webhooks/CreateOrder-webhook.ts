@@ -107,8 +107,9 @@ export class WebhookController {
         String(process.env.STRIPE_WEBHOOK_SECRET),
       );
     } catch (err) {
+      
       throw new BadRequestException(
-        'nao foi possivel pegar as informacoes para continuar com o evento',
+        'nao foi possivel pegar as informacoes para continuar com o evento' + err,
       );
     }
 
