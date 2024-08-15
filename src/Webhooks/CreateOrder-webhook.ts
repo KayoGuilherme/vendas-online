@@ -5,8 +5,8 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
-import { ProductService } from 'src/Products/Products.service';
-import { PrismaService } from 'src/database/prisma.service';
+import { ProductService } from '../Products/Products.service';
+import { PrismaService } from '../database/prisma.service';
 import Stripe from 'stripe';
 
 type IProduto = {

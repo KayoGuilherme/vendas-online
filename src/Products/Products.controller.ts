@@ -26,7 +26,7 @@ import { ParamId_produto } from '../decorators/param-id_produto.decorator';
 import { ParamProdutoId } from '../decorators/param-produtoId.decorator';
 
 @UseGuards(AuthGuard)
-@Controller('Product')
+@Controller('product')
 @ApiTags('Controle de Produtos')
 export class ProductController {
   constructor(
@@ -102,9 +102,9 @@ export class ProductController {
   @Roles(Role.Admin)
   @Get(':idProduct/delivery/:cep')
   async findPriceDelivery(
-    @Param('idProduct') idProduct: number,
+    @Param('id_produto') id_produto: number,
     @Param('cep') cep: string,
   ) {
-    return this.ProductService.findPriceDelivery(cep, idProduct);
+    return this.ProductService.findPriceDelivery(cep, id_produto);
   }
 }

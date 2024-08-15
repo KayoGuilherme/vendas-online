@@ -6,9 +6,9 @@ import {
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaClient } from '@prisma/client';
-import { SizeProductDTO } from 'src/correios/dto/size-product.dto';
-import { CorreiosService } from 'src/correios/correios.service';
-import { CdServiceEnum } from 'src/correios/enums/cd-service.enum';
+import { SizeProductDTO } from '../correios/dto/size-product.dto';
+import { CorreiosService } from '../correios/correios.service';
+import { CdServiceEnum } from '../correios/enums/cd-service.enum';
 import { ReturnPriceDeliveryDto } from './dto/return-price-delivery.dto';
 
 @Injectable()
@@ -194,8 +194,8 @@ export class ProductService {
     });
   }
 
-  async findPriceDelivery(cep: string, idProduct: number): Promise<any> {
-    const product = await this.getById(idProduct);
+  async findPriceDelivery(cep: string, id_produto: number) {
+    const product = await this.getById(id_produto);
 
     const sizeProduct = new SizeProductDTO(product);
 
