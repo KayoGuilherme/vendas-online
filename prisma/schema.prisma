@@ -36,6 +36,7 @@ model Produtos {
   height       Int?
   width        Int?
   diameter     Int?
+  length       Int?
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
   card         card_produtos[]

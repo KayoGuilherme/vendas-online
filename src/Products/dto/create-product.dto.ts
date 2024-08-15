@@ -31,21 +31,30 @@ export class CreateProductDto {
   @IsBoolean()
   oferta: boolean;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   weight?: number;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   height?: number;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   width?: number;
 
+  @ApiProperty()
   @IsOptional()
   @IsNumber()
   diameter?: number;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsNumber()
+  length: number;
 
   @IsNumber()
   @ApiProperty()

@@ -100,9 +100,9 @@ export class ProductController {
 
   @UseGuards(RoleGuard)
   @Roles(Role.Admin)
-  @Get(':idProduct/delivery/:cep')
+  @Get(':id_produto/delivery/:cep')
   async findPriceDelivery(
-    @Param('id_produto') id_produto: number,
+    @ParamId_produto() id_produto: number,
     @Param('cep') cep: string,
   ) {
     return this.ProductService.findPriceDelivery(cep, id_produto);

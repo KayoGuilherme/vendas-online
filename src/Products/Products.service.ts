@@ -9,13 +9,13 @@ import { PrismaClient } from '@prisma/client';
 import { SizeProductDTO } from '../correios/dto/size-product.dto';
 import { CorreiosService } from '../correios/correios.service';
 import { CdServiceEnum } from '../correios/enums/cd-service.enum';
-import { ReturnPriceDeliveryDto } from './dto/return-price-delivery.dto';
+
 
 @Injectable()
 export class ProductService {
   constructor(
     private readonly prisma: PrismaClient,
-    private readonly correiosService: CorreiosService
+    private readonly correiosService: CorreiosService,
   ) {}
 
   async get() {
@@ -103,6 +103,7 @@ export class ProductService {
       diameter,
       height,
       weight,
+      length
     }: UpdateProductDto,
   ) {
     try {
@@ -125,6 +126,7 @@ export class ProductService {
           weight,
           diameter,
           height,
+          length
         },
         where: {
           id_produto: Number(id_produto),
@@ -195,22 +197,34 @@ export class ProductService {
   }
 
   async findPriceDelivery(cep: string, id_produto: number) {
-    const product = await this.getById(id_produto);
+    try {
+      const product = await this.prisma.produtos.findFirst({
+        where: {
+          id_produto: Number(id_produto)
+        }
+      });
 
-    const sizeProduct = new SizeProductDTO(product);
+      const sizeProduct = new SizeProductDTO(product);
 
-    const resultPrice = await Promise.all([
-      this.correiosService.priceDelivery(CdServiceEnum.PAC, cep, sizeProduct),
-      this.correiosService.priceDelivery(CdServiceEnum.SEDEX, cep, sizeProduct),
-      this.correiosService.priceDelivery(
-        CdServiceEnum.SEDEX_10,
-        cep,
-        sizeProduct,
-      ),
-    ]).catch(() => {
-      throw new BadRequestException('Error find delivery price');
-    });
+      const resultPrice = await Promise.all([
+        this.correiosService.priceDelivery(CdServiceEnum.PAC, cep, sizeProduct),
+        this.correiosService.priceDelivery(
+          CdServiceEnum.SEDEX,
+          cep,
+          sizeProduct,
+        ),
+        this.correiosService.priceDelivery(
+          CdServiceEnum.SEDEX_10,
+          cep,
+          sizeProduct,
+        ),
+      ]).catch(() => {
+        throw new BadRequestException('Error find delivery price');
+      });
 
-    return new ReturnPriceDeliveryDto(resultPrice);
+      return resultPrice;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

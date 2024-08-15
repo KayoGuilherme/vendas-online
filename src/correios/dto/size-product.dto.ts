@@ -12,6 +12,8 @@ export class SizeProductDTO {
     this.weight = product.weight;
     this.height = product.height;
     this.width = product.width;
+    this.length = product.length
+
     this.diameter = product.diameter;
     this.productValue = product.preco;
   }
