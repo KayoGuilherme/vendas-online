@@ -88,11 +88,23 @@ export class ProductController {
     return this.ProductService.delete(id_produto);
   }
 
+  @UseGuards(RoleGuard)
+  @Roles(Role.Admin)
+  @Patch(':id_produto')
+  async updateStock(
+    @ParamId_produto() id_produto: number,
+    @Body() quantity: number,
+  ) {
+    return this.ProductService.updateStock(Number(id_produto), quantity);
+  }
 
   @UseGuards(RoleGuard)
   @Roles(Role.Admin)
-  @Patch(":id_produto")
-  async updateStock(@ParamId_produto() id_produto: number, @Body() quantity: number ){
-    return this.ProductService.updateStock(Number(id_produto), quantity)
+  @Get(':idProduct/delivery/:cep')
+  async findPriceDelivery(
+    @Param('idProduct') idProduct: number,
+    @Param('cep') cep: string,
+  ) {
+    return this.ProductService.findPriceDelivery(cep, idProduct);
   }
 }

@@ -6,10 +6,17 @@ import {
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaClient } from '@prisma/client';
+import { SizeProductDTO } from 'src/correios/dto/size-product.dto';
+import { CorreiosService } from 'src/correios/correios.service';
+import { CdServiceEnum } from 'src/correios/enums/cd-service.enum';
+import { ReturnPriceDeliveryDto } from './dto/return-price-delivery.dto';
 
 @Injectable()
 export class ProductService {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(
+    private readonly prisma: PrismaClient,
+    private readonly correiosService: CorreiosService
+  ) {}
 
   async get() {
     try {
@@ -92,6 +99,10 @@ export class ProductService {
       estoque,
       categoryId,
       oferta,
+      width,
+      diameter,
+      height,
+      weight,
     }: UpdateProductDto,
   ) {
     try {
@@ -110,6 +121,10 @@ export class ProductService {
           estoque,
           categoryId,
           oferta,
+          width,
+          weight,
+          diameter,
+          height,
         },
         where: {
           id_produto: Number(id_produto),
@@ -165,11 +180,10 @@ export class ProductService {
   }
 
   async updateStock(id_produto: number, quantity: number) {
-    
     if (quantity <= 0) {
       throw new BadRequestException('Quantidade deve ser positiva');
     }
-    
+
     return this.prisma.produtos.update({
       where: { id_produto: Number(id_produto) },
       data: {
@@ -179,5 +193,24 @@ export class ProductService {
       },
     });
   }
-  }
 
+  async findPriceDelivery(cep: string, idProduct: number): Promise<any> {
+    const product = await this.getById(idProduct);
+
+    const sizeProduct = new SizeProductDTO(product);
+
+    const resultPrice = await Promise.all([
+      this.correiosService.priceDelivery(CdServiceEnum.PAC, cep, sizeProduct),
+      this.correiosService.priceDelivery(CdServiceEnum.SEDEX, cep, sizeProduct),
+      this.correiosService.priceDelivery(
+        CdServiceEnum.SEDEX_10,
+        cep,
+        sizeProduct,
+      ),
+    ]).catch(() => {
+      throw new BadRequestException('Error find delivery price');
+    });
+
+    return new ReturnPriceDeliveryDto(resultPrice);
+  }
+}

@@ -6,6 +6,7 @@ import { ProductService } from './Products.service';
 import { PrismaModule } from '../database/prisma.module';
 import { PrismaClient } from '@prisma/client';
 import { FileModule } from '../file/file.module';
+import { CorreiosModule } from 'src/correios/correios.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { FileModule } from '../file/file.module';
     forwardRef(() => UsersModule),
     PrismaModule,
     FileModule,
+    CorreiosModule
   ],
   controllers: [ProductController],
   providers: [ProductService, PrismaClient],

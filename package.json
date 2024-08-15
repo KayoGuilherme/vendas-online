@@ -39,6 +39,7 @@
     "body-parser": "^1.20.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "correios-brasil": "^3.0.6",
     "dotenv": "^16.3.2",
     "mysql2": "^3.6.5",
     "nodemailer": "^6.9.8",

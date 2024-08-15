@@ -1,117 +1,121 @@
-  generator client {
-    provider = "prisma-client-js"
-  }
+generator client {
+  provider = "prisma-client-js"
+}
 
-  datasource db {
-    provider  = "postgresql"
-    url       = env("DATABASE_URL")
-    directUrl = env("DIRECT_URL")
-  }
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
 
-  model users {
-    id        Int      @id @default(autoincrement())
-    nome      String   @db.VarChar(125)
-    email     String   @unique @db.VarChar(125)
-    senha     String   @db.VarChar(100)
-    Telefone  String   @unique
-    genero    String
-    CPF       String   @unique
-    role      Int      @default(1)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model users {
+  id        Int      @id @default(autoincrement())
+  nome      String   @db.VarChar(125)
+  email     String   @unique @db.VarChar(125)
+  senha     String   @db.VarChar(100)
+  Telefone  String   @unique
+  genero    String
+  CPF       String   @unique
+  role      Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    adress Adress[]
-    cart   cart[]
-    Order  Order[]
-  }
+  adress Adress[]
+  cart   cart[]
+  Order  Order[]
+}
 
-  model Produtos {
-    id_produto   Int             @id @default(autoincrement())
-    nome_produto String          @db.VarChar(125)
-    preco        Float
-    descricao    String          @db.VarChar(125)
-    estoque      Int
-    oferta       Boolean?
-    createdAt    DateTime        @default(now())
-    updatedAt    DateTime        @updatedAt
-    card         card_produtos[]
-    categoryId   Int
+model Produtos {
+  id_produto   Int             @id @default(autoincrement())
+  nome_produto String          @db.VarChar(125)
+  preco        Float
+  descricao    String          @db.VarChar(125)
+  estoque      Int
+  oferta       Boolean?
+  weight       Int?
+  height       Int?
+  width        Int?
+  diameter     Int?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  card         card_produtos[]
+  categoryId   Int
 
-    produto Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-    imagem  ImageProduto[]
-  }
+  produto Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  imagem  ImageProduto[]
+}
 
-  model ImageProduto {
-    id        Int    @id @default(autoincrement())
-    url       String
-    produtoId Int
+model ImageProduto {
+  id        Int    @id @default(autoincrement())
+  url       String
+  produtoId Int
 
-    product Produtos @relation(fields: [produtoId], references: [id_produto])
-  }
+  product Produtos @relation(fields: [produtoId], references: [id_produto])
+}
 
-  model Category {
-    id   Int    @id @default(autoincrement())
-    nome String
+model Category {
+  id   Int    @id @default(autoincrement())
+  nome String
 
-    Produtos Produtos[]
-  }
+  Produtos Produtos[]
+}
 
-  model cart {
-    id        Int      @id @default(autoincrement())
-    userId    Int
-    active    Boolean
-    usuarios  users    @relation(fields: [userId], references: [id])
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model cart {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  active    Boolean
+  usuarios  users    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    carrinho card_produtos[]
-  }
+  carrinho card_produtos[]
+}
 
-  model card_produtos {
-    id        Int @id @default(autoincrement())
-    cartId    Int
-    amount    Int
-    produtoId Int
+model card_produtos {
+  id        Int @id @default(autoincrement())
+  cartId    Int
+  amount    Int
+  produtoId Int
 
-    carrinho cart     @relation(fields: [cartId], references: [id])
-    produtos Produtos @relation(fields: [produtoId], references: [id_produto])
-    Order    Order[]
-  }
+  carrinho cart     @relation(fields: [cartId], references: [id])
+  produtos Produtos @relation(fields: [produtoId], references: [id_produto])
+  Order    Order[]
+}
 
-  model Order {
-    id_order     Int           @id @default(autoincrement())
-    cart_Id      Int
-    carrinho     card_produtos @relation(fields: [cart_Id], references: [id])
-    userId       Int
-    users        users         @relation(fields: [userId], references: [id])
-    adressId     Int
-    adress       Adress        @relation(fields: [adressId], references: [id])
-    Delivered    Boolean?      @default(false)
-    trackingCode String?
+model Order {
+  id_order     Int           @id @default(autoincrement())
+  cart_Id      Int
+  carrinho     card_produtos @relation(fields: [cart_Id], references: [id])
+  userId       Int
+  users        users         @relation(fields: [userId], references: [id])
+  adressId     Int
+  adress       Adress        @relation(fields: [adressId], references: [id])
+  Delivered    Boolean?      @default(false)
+  trackingCode String?
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-  }
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
-  model Adress {
-    id                  Int    @id @default(autoincrement())
-    CEP                 String
-    numero              String?
-    complemento         String
-    ponto_de_referencia String
-    bairro              String
-    estado              String
-    cidade              String
-    telefone_contato    String
-    Rua                 String
-    userId              Int
-    user  users   @relation(fields: [userId], references: [id])
-    Order Order[]
-  }
+model Adress {
+  id                  Int     @id @default(autoincrement())
+  CEP                 String
+  numero              String?
+  complemento         String
+  ponto_de_referencia String
+  bairro              String
+  estado              String
+  cidade              String
+  telefone_contato    String
+  Rua                 String
+  userId              Int
+  user                users   @relation(fields: [userId], references: [id])
+  Order               Order[]
+}
 
-  model Profit {
-    id        Int      @id @default(autoincrement())
-    amount    Int
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-  }
+model Profit {
+  id        Int      @id @default(autoincrement())
+  amount    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
