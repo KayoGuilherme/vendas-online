@@ -49,6 +49,7 @@ export class PaymentService {
           produtos.map((item) => ({
             price: item.produtos.preco,
             amount: item.amount,
+            id_produto: item.produtoId
           })),
         ),
       },

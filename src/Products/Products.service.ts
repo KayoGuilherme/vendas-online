@@ -169,6 +169,7 @@ export class ProductService {
     if (quantity <= 0) {
       throw new BadRequestException('Quantidade deve ser positiva');
     }
+    
     return this.prisma.produtos.update({
       where: { id_produto: Number(id_produto) },
       data: {
