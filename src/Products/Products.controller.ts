@@ -99,7 +99,6 @@ export class ProductController {
   }
 
   @UseGuards(RoleGuard)
-  @Roles(Role.Admin)
   @Get(':id_produto/delivery/:cep')
   async findPriceDelivery(
     @ParamId_produto() id_produto: number,

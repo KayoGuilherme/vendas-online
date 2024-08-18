@@ -39,17 +39,9 @@ export class ProductService {
       throw new BadRequestException('Nao foi possivel visalizar os Produtos.');
     }
   }
-
   async getById(id_produto: number) {
     try {
-      const ProductExist = await this.prisma.produtos.findUnique({
-        where: {
-          id_produto: Number(id_produto),
-        },
-      });
-      if (!ProductExist) throw new NotFoundException('Esse Produto não existe');
-
-      const Product = await this.prisma.produtos.findUnique({
+      const product = await this.prisma.produtos.findFirst({
         where: {
           id_produto: Number(id_produto),
         },
@@ -62,14 +54,18 @@ export class ProductService {
           },
         },
       });
-
-      return Product;
+  
+      if (!product) {
+        throw new NotFoundException('Esse Produto não existe');
+      }
+  
+      return product;
     } catch (error) {
-      throw new BadRequestException(
-        'nao foi possivel visualizar este produto. ',
-      );
+      console.error('Erro ao obter produto:', error);
+      throw new BadRequestException('Não foi possível visualizar este produto.');
     }
   }
+  
 
   async create(data: CreateProductDto) {
     try {
@@ -198,33 +194,24 @@ export class ProductService {
 
   async findPriceDelivery(cep: string, id_produto: number) {
     try {
-      const product = await this.prisma.produtos.findFirst({
-        where: {
-          id_produto: Number(id_produto)
-        }
-      });
+      const product = await this.getById(id_produto);
 
+      if (!product) {
+        throw new BadRequestException('Produto não encontrado');
+      }
+  
       const sizeProduct = new SizeProductDTO(product);
-
+  
       const resultPrice = await Promise.all([
         this.correiosService.priceDelivery(CdServiceEnum.PAC, cep, sizeProduct),
-        this.correiosService.priceDelivery(
-          CdServiceEnum.SEDEX,
-          cep,
-          sizeProduct,
-        ),
-        this.correiosService.priceDelivery(
-          CdServiceEnum.SEDEX_10,
-          cep,
-          sizeProduct,
-        ),
-      ]).catch(() => {
-        throw new BadRequestException('Error find delivery price');
-      });
-
+        this.correiosService.priceDelivery(CdServiceEnum.SEDEX, cep, sizeProduct),
+        this.correiosService.priceDelivery(CdServiceEnum.SEDEX_10, cep, sizeProduct),
+      ]);
+  
       return resultPrice;
     } catch (error) {
-      console.log(error);
+      console.error('Erro ao encontrar o preço de entrega:', error);
+      throw new BadRequestException('Erro ao encontrar o preço de entrega.');
     }
   }
 }

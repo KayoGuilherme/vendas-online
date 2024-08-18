@@ -16,24 +16,39 @@ export class CorreiosService {
     sizeProduct: SizeProductDTO,
   ): Promise<ResponsePriceCorreios> {
     try {
-      const response = await axios.post(this.API_URL, {
-        cdServico: cdService,
-        cepOrigem: this.CEP_COMPANY,
-        cepDestino: cep,
-        cdFormato: CdFormatEnum.BOX,
-        vlPeso: sizeProduct.weight,
-        vlComprimento: sizeProduct.length,
-        vlAltura: sizeProduct.height,
-        vlLargura: sizeProduct.width,
-        vlDiametro: sizeProduct.diameter,
-        cdEmpresa: '',
-        dsSenha: '',
-        cdMaoPropria: 'N',
-        vlValorDeclarado:
-          sizeProduct.productValue < 25 ? 0 : sizeProduct.productValue,
-        cdAvisoRecebimento: 'N',
-      });
-      console.log(response.data);
+      const response = await axios.post(
+        this.API_URL,
+        {
+          idLote: '1234567890',
+          parametrosProduto: [
+            {
+              coProduto: "04162",
+                nuRequisicao: "12345",
+              cdServico: cdService,
+              cepOrigem: this.CEP_COMPANY,
+              cepDestino: cep,
+              cdFormato: CdFormatEnum.BOX,
+              vlPeso: sizeProduct.weight,
+              vlComprimento: sizeProduct.length,
+              vlAltura: sizeProduct.height,
+              vlLargura: sizeProduct.width,
+              vlDiametro: sizeProduct.diameter,
+              psObjeto: sizeProduct.weight.toString(),
+              cdEmpresa: '',
+              dsSenha: '',
+              cdMaoPropria: 'N',
+              vlValorDeclarado:
+                sizeProduct.productValue < 25 ? 0 : sizeProduct.productValue,
+              cdAvisoRecebimento: 'N',
+            },
+          ],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${this.API_TOKEN}`,
+          },
+        },
+      );
 
       if (response.data) {
         return response.data as ResponsePriceCorreios;
@@ -41,7 +56,6 @@ export class CorreiosService {
         throw new BadRequestException('No response from API');
       }
     } catch (error) {
-      // Detalhamento do erro de resposta
       if (error.response) {
         console.error('API Response Error:', {
           status: error.response.status,
