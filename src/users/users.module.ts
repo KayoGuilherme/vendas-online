@@ -12,6 +12,7 @@ import { AuthModule } from '../auth/auth.module';
 import { PrismaModule } from '../database/prisma.module';
 import { PrismaClient } from '@prisma/client';
 
+
 @Module({
   imports: [forwardRef(() => AuthModule), PrismaModule],
   controllers: [UsersController],

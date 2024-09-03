@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaClient, card_produtos, cart } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { InserCartDto } from './dtos/insert-cart.dto';
 import { CartProductService } from '../cartProduct/cart_product.service';
 import { UpdateCartDto } from '../cartProduct/dto/update-cart.dto';

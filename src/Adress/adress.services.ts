@@ -54,6 +54,7 @@ export class AdressService {
       telefone_contato,
       Rua,
     }: AdressDTO,
+    id: number,
     userId: number,
   ) {
     const user = await this.usersService.readById(userId);
@@ -62,7 +63,10 @@ export class AdressService {
       throw new NotFoundException('não foi possivel encontrar o usuario');
 
     try {
-      const adress = await this.prisma.adress.updateMany({
+      const adress = await this.prisma.adress.update({
+        where: {
+          id: Number(id)
+        },
         data: {
           CEP,
           bairro,

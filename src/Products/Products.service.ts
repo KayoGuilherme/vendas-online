@@ -5,10 +5,11 @@ import {
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PrismaClient } from '@prisma/client';
+
 import { SizeProductDTO } from '../correios/dto/size-product.dto';
 import { CorreiosService } from '../correios/correios.service';
 import { CdServiceEnum } from '../correios/enums/cd-service.enum';
+import { PrismaClient } from '@prisma/client';
 
 
 @Injectable()

@@ -3,14 +3,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
 import { CreateCategoryDTO } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { ProductCategoryDto } from './dto/update-product-category.dto';
+import { PrismaClient } from '@prisma/client';
+
 
 @Injectable()
 export class CategoryProductService {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly prisma: PrismaClient ) {}
 
   async createCategory(data: CreateCategoryDTO) {
     try {

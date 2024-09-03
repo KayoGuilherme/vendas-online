@@ -4,8 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InserCartDto } from './dto/insert-cart.dto';
-import { PrismaClient, cart } from '@prisma/client';
-import { ProductService } from '../Products/Products.service';
+import { cart, PrismaClient } from '@prisma/client';
+import { ProductService,  } from '../Products/Products.service';
 import { UpdateCartDto } from './dto/update-cart.dto';
 
 const LINE_AFFECTED = 1;

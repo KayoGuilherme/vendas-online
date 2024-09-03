@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ProfitService } from './profit.service';
 import { ProfitController } from './profit.controller';
-import { PrismaClient } from '@prisma/client';
+
 import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from 'src/users/users.module';
+import { PrismaClient } from '@prisma/client';
 
 @Module({
   imports: [AuthModule, UsersModule],

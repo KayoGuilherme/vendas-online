@@ -26,6 +26,7 @@ CREATE TABLE "Produtos" (
     "height" INTEGER,
     "width" INTEGER,
     "diameter" INTEGER,
+    "length" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "categoryId" INTEGER NOT NULL,

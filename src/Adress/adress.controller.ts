@@ -5,7 +5,6 @@ import {
   Get,
   Patch,
   Post,
-  Put,
   UseGuards,
 } from '@nestjs/common';
 import { AdressDTO } from './dto/adress-create.dto';
@@ -31,9 +30,9 @@ export class AdressController {
     return this.adressService.saveAdress(data, userId);
   }
 
-  @Patch()
-  async updateAdress(@Body() data: AdressDTO, @User() userId: number) {
-    return this.adressService.updateAdress(data, userId);
+  @Patch(":id")
+  async updateAdress(@Body() data: AdressDTO, @User() userId: number, @Paramid() id: number) {
+    return this.adressService.updateAdress(data, userId, id);
   }
 
   @Delete(':id')

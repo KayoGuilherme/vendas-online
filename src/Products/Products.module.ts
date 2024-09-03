@@ -2,11 +2,13 @@ import { Module, forwardRef } from '@nestjs/common';
 import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from 'src/users/users.module';
 import { ProductController } from './Products.controller';
-import { ProductService } from './Products.service';
-import { PrismaModule } from '../database/prisma.module';
-import { PrismaClient } from '@prisma/client';
 import { FileModule } from '../file/file.module';
 import { CorreiosModule } from 'src/correios/correios.module';
+import { FileService } from 'src/file/file.service';
+import { PrismaClient } from '@prisma/client';
+import { PrismaService } from 'src/database/prisma.service';
+import { PrismaModule } from 'src/database/prisma.module';
+import { ProductService } from './Products.service';
 
 @Module({
   imports: [
@@ -17,7 +19,7 @@ import { CorreiosModule } from 'src/correios/correios.module';
     CorreiosModule
   ],
   controllers: [ProductController],
-  providers: [ProductService, PrismaClient],
-  exports: [ProductService, ProductModule],
+  providers: [ProductService, PrismaService, FileService, PrismaClient],
+  exports: [ProductService]
 })
 export class ProductModule {}
