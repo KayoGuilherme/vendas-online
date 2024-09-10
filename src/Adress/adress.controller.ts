@@ -14,7 +14,6 @@ import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../guards/auth.guard';
 import { User } from '../decorators/user.decorator';
 
-@UseGuards(AuthGuard)
 @ApiTags('Controle de Endereços')
 @Controller('Endereco')
 export class AdressController {
@@ -30,8 +29,11 @@ export class AdressController {
     return this.adressService.saveAdress(data, userId);
   }
 
+
+  @UseGuards(AuthGuard)
   @Patch(":id")
   async updateAdress(@Body() data: AdressDTO, @User() userId: number, @Paramid() id: number) {
+    console.log(userId);
     return this.adressService.updateAdress(data, userId, id);
   }
 

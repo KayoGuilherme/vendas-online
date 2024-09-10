@@ -59,6 +59,8 @@ export class AdressService {
   ) {
     const user = await this.usersService.readById(userId);
 
+    console.log(user);
+
     if (!user)
       throw new NotFoundException('não foi possivel encontrar o usuario');
 
@@ -85,7 +87,7 @@ export class AdressService {
     } catch (error) {
       console.log(error);
       throw new BadRequestException(
-        'não foi possivel atualizar informações de endereço, por favor atualize a pagina e tente novamente.',
+        'não foi possivel atualizar informações de endereço, por favor atualize a pagina e tente novamente.', error
       );
     }
   }
