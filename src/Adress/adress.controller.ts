@@ -3,16 +3,18 @@ import {
   Controller,
   Delete,
   Get,
-  Patch,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { AdressDTO } from './dto/adress-create.dto';
 import { Paramid } from '../decorators/param-id.decorator';
 import { AdressService } from './adress.services';
 import { ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '../guards/auth.guard';
 import { User } from '../decorators/user.decorator';
+import { AuthGuard } from 'src/guards/auth.guard';
+
+
 
 @ApiTags('Controle de Endereços')
 @Controller('Endereco')
@@ -29,9 +31,8 @@ export class AdressController {
     return this.adressService.saveAdress(data, userId);
   }
 
-
   @UseGuards(AuthGuard)
-  @Patch(":id")
+  @Put(":id")
   async updateAdress(@Body() data: AdressDTO, @User() userId: number, @Paramid() id: number) {
     console.log(userId);
     return this.adressService.updateAdress(data, userId, id);
