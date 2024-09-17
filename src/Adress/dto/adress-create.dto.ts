@@ -49,8 +49,7 @@ export class AdressDTO {
     @MaxLength(11)
     telefone_contato: string;
 
-    @IsNotEmpty()
-    @IsNumber()
+  
     @ApiProperty()
     userId: number;
 

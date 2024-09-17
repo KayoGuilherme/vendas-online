@@ -17,10 +17,14 @@ export class AdressService {
   ) {}
 
   async saveAdress(data: AdressDTO, userId: number) {
-    await this.usersService.readById(userId);
+    const user = await this.usersService.readById(userId);
+    console.log('USERIDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa', user);
 
     const adress = await this.prisma.adress.create({
-      data,
+      data: {
+        ...data,
+        userId: user.id,
+      },
     });
 
     return adress;
@@ -43,6 +47,8 @@ export class AdressService {
   }
 
   async updateAdress(
+    id: number,
+    userId: number,
     {
       CEP,
       bairro,
@@ -52,22 +58,27 @@ export class AdressService {
       numero,
       ponto_de_referencia,
       telefone_contato,
-      Rua,
-    }: AdressDTO,
-    id: number,
-    userId: number,
+      Rua
+    }: AdressDTO
   ) {
     const user = await this.usersService.readById(userId);
 
-    console.log(user);
-
-    if (!user)
-      throw new NotFoundException('não foi possivel encontrar o usuario');
-
     try {
-      const adress = await this.prisma.adress.update({
+      const address = await this.prisma.adress.findFirst({
         where: {
-          id: Number(id)
+          id: Number(id),
+          userId: user.id,
+        },
+      });
+
+      if (!address)
+        return new NotFoundException(
+          'Endereço não encontrado na base de dados',
+        );
+
+      const response = await this.prisma.adress.update({
+        where: {
+          id: Number(id),
         },
         data: {
           CEP,
@@ -79,24 +90,23 @@ export class AdressService {
           ponto_de_referencia,
           telefone_contato,
           Rua,
-          userId,
+          userId: user.id
         },
       });
+
 
       return { sucess: true };
     } catch (error) {
       console.log(error);
       throw new BadRequestException(
-        'não foi possivel atualizar informações de endereço, por favor atualize a pagina e tente novamente.', error
+        'não foi possivel atualizar informações de endereço, por favor atualize a pagina e tente novamente.',
+        error,
       );
     }
   }
 
   async deleteAdress(id: number, userId: number) {
-    const user = await this.usersService.readById(userId);
-
-    if (!user)
-      throw new NotFoundException('não foi possivel encontrar o usuario');
+    await this.usersService.readById(userId);
 
     try {
       const adress = await this.prisma.adress.delete({
