@@ -1,8 +1,7 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
-import axios from "axios";
 import { SizeProductDTO } from "./dto/size-product.dto";
 import { CdFormatEnum } from "./enums/cd-formate.enum";
-
+import axios from "axios";
 
 @Injectable()
 export class CorreiosService {
@@ -15,8 +14,8 @@ export class CorreiosService {
 
   private async refreshToken() {
     try {
-      const username = process.env.USUARIO_CORREIOS;  // Seu CNPJ
-      const password = process.env.tokenCorreios;
+      const username = process.env.USUARIO_CORREIOS;
+      const password = process.env.TOKEN_CORREIOS;
       const auth = Buffer.from(`${username}:${password}`).toString("base64");
 
       const response = await axios.post(
