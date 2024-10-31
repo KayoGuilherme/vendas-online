@@ -1,11 +1,7 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
-import { AdressDTO } from './dto/adress-create.dto';
-import { UsersService } from '../users/users.service';
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaClient } from "@prisma/client";
+import { AdressDTO } from "./dto/adress-create.dto";
+import { UsersService } from "../users/users.service";
 
 const LINE_AFFECTED = 1;
 
@@ -13,18 +9,18 @@ const LINE_AFFECTED = 1;
 export class AdressService {
   constructor(
     private readonly prisma: PrismaClient,
-    private readonly usersService: UsersService,
-  ) {}
+    private readonly usersService: UsersService
+  ) {
+  }
 
   async saveAdress(data: AdressDTO, userId: number) {
     const user = await this.usersService.readById(userId);
-    console.log('USERIDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa', user);
 
     const adress = await this.prisma.adress.create({
       data: {
         ...data,
-        userId: user.id,
-      },
+        userId: user.id
+      }
     });
 
     return adress;
@@ -34,14 +30,14 @@ export class AdressService {
     try {
       const adress = await this.prisma.adress.findMany({
         where: {
-          userId,
-        },
+          userId
+        }
       });
       return adress;
     } catch (error) {
       console.log(error);
       throw new BadRequestException(
-        'Não foi possivel visualizar o endereço do usuario',
+        "Não foi possivel visualizar o endereço do usuario"
       );
     }
   }
@@ -67,18 +63,18 @@ export class AdressService {
       const address = await this.prisma.adress.findFirst({
         where: {
           id: Number(id),
-          userId: user.id,
-        },
+          userId: user.id
+        }
       });
 
       if (!address)
         return new NotFoundException(
-          'Endereço não encontrado na base de dados',
+          "Endereço não encontrado na base de dados"
         );
 
-      const response = await this.prisma.adress.update({
+      await this.prisma.adress.update({
         where: {
-          id: Number(id),
+          id: Number(id)
         },
         data: {
           CEP,
@@ -91,7 +87,7 @@ export class AdressService {
           telefone_contato,
           Rua,
           userId: user.id
-        },
+        }
       });
 
 
@@ -99,8 +95,8 @@ export class AdressService {
     } catch (error) {
       console.log(error);
       throw new BadRequestException(
-        'não foi possivel atualizar informações de endereço, por favor atualize a pagina e tente novamente.',
-        error,
+        "não foi possivel atualizar informações de endereço, por favor atualize a pagina e tente novamente.",
+        error
       );
     }
   }
@@ -111,18 +107,18 @@ export class AdressService {
     try {
       const adress = await this.prisma.adress.delete({
         where: {
-          id,
-        },
+          id
+        }
       });
 
       return {
         row: [],
-        LINE_AFFECTED,
+        LINE_AFFECTED
       };
     } catch (error) {
       console.log(error);
       throw new BadRequestException(
-        'não foi possivel deletar endereço, por favor tente novamente.',
+        "não foi possivel deletar endereço, por favor tente novamente."
       );
     }
   }

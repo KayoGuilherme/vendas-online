@@ -41,7 +41,6 @@ export class CorreiosService {
         throw new Error("Token não retornado na resposta");
       }
     } catch (error) {
-      console.error("Erro ao autenticar com os Correios:", error.response?.data || error.message);
       if (error.response && error.response.status === 403) {
         throw new BadRequestException("Erro de permissão com os Correios. Verifique o contrato e permissões.");
       }

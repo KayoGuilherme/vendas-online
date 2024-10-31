@@ -78,11 +78,13 @@ export class WebhookController {
           throw new BadRequestException('Lucro total inválido');
         }
 
-        await this.prisma.profit.create({
+      const profit =  await this.prisma.profit.create({
           data: {
             amount: totalProfit,
           },
         });
+
+        console.log(profit);
 
         await this.prisma.order.create({
           data,
