@@ -11,8 +11,8 @@ import Stripe from 'stripe';
 
 type IProduto = {
   id_produto: number;
-  amount: number
-}
+  amount: number;
+};
 
 @Controller('')
 export class WebhookController {
@@ -20,8 +20,8 @@ export class WebhookController {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly productService: ProductService
-    ) {
+    private readonly productService: ProductService,
+  ) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
       apiVersion: '2023-10-16',
     });
@@ -50,24 +50,26 @@ export class WebhookController {
       if (event.type === 'checkout.session.completed') {
         const session = event.data.object as Stripe.Checkout.Session;
 
+        //Pego os dados via MetaDados enviados no apos o pagamento
         const data = {
           userId: Number(session.metadata.userId),
           cart_Id: Number(session.metadata.cartId),
           adressId: Number(session.metadata.adressId),
         };
 
-
+        //Verifico se esses dados foram enviados corretamente
         if (!data.userId || !data.cart_Id || !data.adressId) {
           throw new NotFoundException('Dados nao econtrados');
         }
 
+        //Pego o preco dos produtos
         const productPrices = JSON.parse(session.metadata.productPrices);
         let totalProfit = 0;
         productPrices.forEach((item) => {
           totalProfit += item.price * item.amount;
         });
 
-
+        //Atualizo o estoque dos produtos comprados fazendo um decremento
         for (const product of productPrices) {
           const { id_produto, amount } = product as IProduto;
 
@@ -78,14 +80,14 @@ export class WebhookController {
           throw new BadRequestException('Lucro total inválido');
         }
 
-      const profit =  await this.prisma.profit.create({
+        //Pego os precos dos produtos e mando para um total lucrado no banco de dados
+        const profit = await this.prisma.profit.create({
           data: {
             amount: totalProfit,
           },
         });
 
-        console.log(profit);
-
+        //Crio o pedido
         await this.prisma.order.create({
           data,
         });
