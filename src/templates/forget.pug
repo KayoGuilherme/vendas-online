@@ -1,1 +1,66 @@
-p #{name} Verificamos que você solicitou a recuperação de senha, clique no link a seguir para que a recuperação seja concluida: <a href= "https://projeto-vendas.vercel.app/changePass">#{link}</a>
+doctype html
+html
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    style.
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f6f8;
+        color: #333;
+        margin: 0;
+        padding: 20px;
+      }
+      .email-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        background-color: #223074; 
+        color: white;
+        padding: 20px;
+        text-align: center;
+        font-size: 1.5em;
+      }
+      .content {
+        padding: 20px;
+        line-height: 1.6;
+      }
+      .content p {
+        margin: 15px 0;
+      }
+      .button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #223074; 
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+      .footer {
+        text-align: center;
+        padding: 10px;
+        font-size: 0.9em;
+        color: #888;
+        border-top: 1px solid #ddd;
+        margin-top: 20px;
+      }
+  body
+    .email-container
+      .header
+        | Recuperação de Senha
+      .content
+        p Opa, #{name}!
+        p Verificamos que você está querendo recuperar sua senha. Se você não fez essa solicitação, por favor, entre em contato com nosso suporte imediatamente.
+        p Para continuar com a recuperação de sua senha, clique no botão abaixo:
+        a.button(href=link) Recuperar Senha
+        p Se você não conseguir acessar o botão, copie e cole o seguinte link no navegador:
+        p #{link}
+      .footer
+        | © 2024 Yeshua Professional. Todos os direitos reservados.
