@@ -7,7 +7,6 @@ import { PrismaClient } from '@prisma/client';
 import { MailerService } from '@nestjs-modules/mailer';
 import { UsersService } from '../users/users.service';
 import { SendtrackingDto } from './dtos/send-tracking-dto';
-import { CartProductService } from 'src/cartProduct/cart_product.service';
 import { CartService } from 'src/cart/cart.service';
 
 @Injectable()

@@ -159,6 +159,8 @@ export class ProductService {
         },
       });
 
+      
+
       await this.prisma.card_produtos.deleteMany({
         where: {
           produtoId: Number(id_produto),

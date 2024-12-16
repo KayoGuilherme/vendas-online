@@ -23,6 +23,7 @@ model users {
   adress Adress[]
   cart   cart[]
   Order  Order[]
+  Review Review[]
 }
 
 model Produtos {
@@ -44,6 +45,7 @@ model Produtos {
 
   produto Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   imagem  ImageProduto[]
+  Review  Review[]
 }
 
 model ImageProduto {
@@ -96,6 +98,7 @@ model Order {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Review    Review[]
 }
 
 model Adress {
@@ -119,4 +122,19 @@ model Profit {
   amount    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  produtoId Int
+  orderId   Int
+  rating    Int      @default(1)
+  comment   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    users    @relation(fields: [userId], references: [id])
+  produto Produtos @relation(fields: [produtoId], references: [id_produto])
+  order   Order    @relation(fields: [orderId], references: [id_order])
 }

@@ -18,6 +18,7 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import { WebHooksModule } from './Webhooks/webhooks.module';
 import { ProfitModule } from './profit/profit.module';
 import { CorreiosModule } from './correios/correios.module';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { CorreiosModule } from './correios/correios.module';
     }),
     ProfitModule,
     CorreiosModule,
+    ReviewModule,
   ],
 })
 export class AppModule {}
