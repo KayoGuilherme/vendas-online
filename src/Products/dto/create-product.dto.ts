@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Max,
 } from 'class-validator';
 
 export class CreateProductDto {
@@ -20,6 +21,7 @@ export class CreateProductDto {
 
   @IsNotEmpty()
   @IsString()
+  @Max(255)
   @ApiProperty()
   descricao: string;
 
