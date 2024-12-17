@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsString,
   Max,
+  MaxLength,
 } from 'class-validator';
 
 export class CreateProductDto {
@@ -21,7 +22,7 @@ export class CreateProductDto {
 
   @IsNotEmpty()
   @IsString()
-  @Max(255)
+  @MaxLength(500)
   @ApiProperty()
   descricao: string;
 

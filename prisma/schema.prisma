@@ -30,7 +30,7 @@ model Produtos {
   id_produto   Int             @id @default(autoincrement())
   nome_produto String          @db.VarChar(125)
   preco        Float
-  descricao    String          @db.VarChar(255)
+  descricao    String          @db.VarChar(500)
   estoque      Int
   oferta       Boolean?
   weight       Int?

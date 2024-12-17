@@ -7,10 +7,9 @@ import { CreateCategoryDTO } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { PrismaClient } from '@prisma/client';
 
-
 @Injectable()
 export class CategoryProductService {
-  constructor(private readonly prisma: PrismaClient ) {}
+  constructor(private readonly prisma: PrismaClient) {}
 
   async createCategory(data: CreateCategoryDTO) {
     try {
@@ -27,28 +26,35 @@ export class CategoryProductService {
 
   async getCategory() {
     try {
-      const getCategory = await this.prisma.category.findMany({
+      const getCategory = await this.prisma.category.findMany();
+
+      return getCategory;
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException('Erro ao visualizar Categorias');
+    }
+  }
+
+  async getProductsPerCategory() {
+    try {
+      const getProductPerCategory = await this.prisma.category.findMany({
         include: {
           Produtos: {
             select: {
               id_produto: true,
               nome_produto: true,
-              descricao: true,
+              imagem: true,
               preco: true,
-              estoque: true,
               oferta: true,
-              imagem: {
-                select: {
-                  produtoId: true,
-                  url: true,
-                },
-              },
+              estoque: true,
+              descricao: true,
+              Review: true,
             },
           },
         },
       });
 
-      return getCategory;
+      return getProductPerCategory;
     } catch (error) {
       console.log(error);
       throw new BadRequestException('Erro ao visualizar Categorias');
