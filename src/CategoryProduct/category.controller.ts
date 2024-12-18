@@ -46,4 +46,10 @@ export class CategoryProductController {
   async deleteCategory(@Paramid() id) {
     return this.categoryProduct.delete(id);
   }
+
+  @UseGuards(AuthGuard)
+  @Get()
+  async getProductPerCategory() {
+    return this.getProductPerCategory();
+  }
 }

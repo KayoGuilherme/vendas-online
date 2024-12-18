@@ -75,27 +75,25 @@ model cart {
 }
 
 model card_produtos {
-  id        Int @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   cartId    Int
   amount    Int
   produtoId Int
-
-  carrinho cart     @relation(fields: [cartId], references: [id])
-  produtos Produtos @relation(fields: [produtoId], references: [id_produto])
-  Order    Order[]
+  Delivered Boolean? @default(false)
+  carrinho  cart     @relation(fields: [cartId], references: [id])
+  produtos  Produtos @relation(fields: [produtoId], references: [id_produto])
+  Order     Order[]
 }
 
 model Order {
-  id_order     Int           @id @default(autoincrement())
-  cart_Id      Int
-  carrinho     card_produtos @relation(fields: [cart_Id], references: [id])
-  userId       Int
-  users        users         @relation(fields: [userId], references: [id])
-  adressId     Int
-  adress       Adress        @relation(fields: [adressId], references: [id])
-  Delivered    Boolean?      @default(false)
+  id_order Int           @id @default(autoincrement())
+  cart_Id  Int
+  carrinho card_produtos @relation(fields: [cart_Id], references: [id])
+  userId   Int
+  users    users         @relation(fields: [userId], references: [id])
+  adressId Int
+  adress   Adress        @relation(fields: [adressId], references: [id])
   trackingCode String?
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Review    Review[]

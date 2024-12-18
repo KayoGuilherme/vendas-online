@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Patch,
   Put,
   UseGuards,
@@ -37,14 +38,14 @@ export class OrderController {
 
   @Roles(Role.cliente)
   @Get('User')
-  async getOrderUser(@User() userId: number, Delivered: boolean) {
-    return this.orderService.getOrderUser(userId, Delivered);
+  async getOrderUser(@User() userId: number) {
+    return this.orderService.getOrderUser(userId);
   }
 
   @Roles(Role.Admin)
-  @Patch(':id')
-  async UpdateDeliveredProduct(@Paramid() id: number, @User() userId: number) {
-    return this.orderService.DeliveredProduct(id, userId);
+  @Patch(':id/:cardProductId')
+  async UpdateDeliveredProduct(@Paramid() id: number, @User() userId: number, @Param("cardProductId") cardProductId: number) {
+    return this.orderService.DeliveredProduct(id, userId, cardProductId);
   }
 
   @Roles(Role.Admin)

@@ -150,12 +150,11 @@ export class OrderService {
     }
   }
 
-  async getOrderUser(userId: number, Delivered: boolean) {
+  async getOrderUser(userId: number) {
     try {
       const user = await this.prisma.order.findFirst({
         where: {
-          userId: Number(userId),
-          Delivered: false,
+          userId: Number(userId)
         },
       });
 
@@ -221,35 +220,45 @@ export class OrderService {
     }
   }
 
-  async DeliveredProduct(id_order: number, userId: number) {
+  async DeliveredProduct(id_order: number, userId: number, cardProductId: number,) {
     try {
+    
       await this.users.readById(userId);
-
-      const Order = await this.prisma.order.findFirst({
-        where: {
-          id_order: Number(id_order),
-        },
+  
+      const order = await this.prisma.order.findFirst({
+        where: { id_order, userId },
       });
-
-      if (!Order)
+      if (!order) {
         throw new NotFoundException(
-          'Esse pedido nao existe ou nao foi encontrado na base de dados.',
+          'Esse pedido não existe ou não está associado a esse usuário.',
         );
-
-      const DeliveredProduct = await this.prisma.order.update({
-        where: {
-          id_order: Number(id_order),
-        },
-        data: {
-          Delivered: true,
-        },
+      }
+  
+      
+      const productItem = await this.prisma.card_produtos.findFirst({
+        where: { id: Number(cardProductId), cartId: order.cart_Id },
       });
-
-      return DeliveredProduct;
+      if (!productItem) {
+        throw new NotFoundException(
+          'Esse produto não está associado a esse pedido.',
+        );
+      }
+  
+     
+      const deliveredItem = await this.prisma.card_produtos.update({
+        where: { id: Number(cardProductId) },
+        data: { Delivered: true },
+      });
+  
+      return {
+        success: true,
+        message: 'Produto confirmado como entregue.',
+        deliveredItem,
+      };
     } catch (error) {
-      console.log(error);
+      console.error(error);
       throw new BadRequestException(
-        'Nao foi possivel atualizar status de entrega do produto.',
+        'Não foi possível confirmar a entrega do produto.',
       );
     }
   }

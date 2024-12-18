@@ -29,11 +29,7 @@ export class ReviewService {
       );
     }
 
-    if (!orderUser.Delivered) {
-      throw new BadRequestException(
-        'Avaliações só podem ser feitas para pedidos entregues.',
-      );
-    }
+   
 
     const existingReview = await this.prisma.review.findFirst({
       where: {

@@ -68,6 +68,7 @@ CREATE TABLE "card_produtos" (
     "cartId" INTEGER NOT NULL,
     "amount" INTEGER NOT NULL,
     "produtoId" INTEGER NOT NULL,
+    "Delivered" BOOLEAN DEFAULT false,
 
     CONSTRAINT "card_produtos_pkey" PRIMARY KEY ("id")
 );
@@ -78,7 +79,6 @@ CREATE TABLE "Order" (
     "cart_Id" INTEGER NOT NULL,
     "userId" INTEGER NOT NULL,
     "adressId" INTEGER NOT NULL,
-    "Delivered" BOOLEAN DEFAULT false,
     "trackingCode" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
