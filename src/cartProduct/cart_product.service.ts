@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InserCartDto } from './dto/insert-cart.dto';
 import { cart, PrismaClient } from '@prisma/client';
-import { ProductService } from '../Products/Products.service';
+import { ProductService,  } from '../Products/Products.service';
 import { UpdateCartDto } from './dto/update-cart.dto';
 
 const LINE_AFFECTED = 1;
@@ -72,7 +72,6 @@ export class CartProductService {
         where: {
           cartId,
           produtoId: Number(produtoId),
-          inCart: true,
         },
       });
 
@@ -80,11 +79,8 @@ export class CartProductService {
         throw new NotFoundException('Produto não encontrado no carrinho.');
       }
 
-      await this.prisma.card_produtos.update({
+      await this.prisma.card_produtos.delete({
         where: { id: productInCart.id },
-        data: {
-          inCart: false,
-        },
       });
 
       return {
@@ -94,7 +90,7 @@ export class CartProductService {
     } catch (error) {
       console.log(error);
       throw new BadRequestException(
-        'Não foi possível remover o produto do carrinho, por favor tente novamente.',
+        'não foi possivel excluir o produto do carrinho, por favor tente novamente.',
       );
     }
   }
