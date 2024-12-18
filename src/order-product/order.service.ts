@@ -16,7 +16,7 @@ export class OrderService {
     private readonly mailer: MailerService,
     private readonly users: UsersService,
     private readonly cartService: CartService,
-  ) { }
+  ) {}
 
   async getOrderProducts() {
     try {
@@ -154,7 +154,7 @@ export class OrderService {
     try {
       const user = await this.prisma.order.findFirst({
         where: {
-          userId: Number(userId)
+          userId: Number(userId),
         },
       });
 
@@ -220,11 +220,14 @@ export class OrderService {
     }
   }
 
-  async DeliveredProduct(id_order: number, userId: number, cardProductId: number,) {
+  async DeliveredProduct(
+    id_order: number,
+    userId: number,
+    cardProductId: number,
+  ) {
     try {
-    
       await this.users.readById(userId);
-  
+
       const order = await this.prisma.order.findFirst({
         where: { id_order, userId },
       });
@@ -233,8 +236,7 @@ export class OrderService {
           'Esse pedido não existe ou não está associado a esse usuário.',
         );
       }
-  
-      
+
       const productItem = await this.prisma.card_produtos.findFirst({
         where: { id: Number(cardProductId), cartId: order.cart_Id },
       });
@@ -243,13 +245,12 @@ export class OrderService {
           'Esse produto não está associado a esse pedido.',
         );
       }
-  
-     
+
       const deliveredItem = await this.prisma.card_produtos.update({
         where: { id: Number(cardProductId) },
         data: { Delivered: true },
       });
-  
+
       return {
         success: true,
         message: 'Produto confirmado como entregue.',
@@ -276,15 +277,17 @@ export class OrderService {
         data,
       });
 
-      const productNames = cart.carrinho.map((item) => item.produtos.nome_produto.toString()).join(', ');
+      const productNames = cart.carrinho
+        .map((item) => item.produtos.nome_produto.toString())
+        .join(', ');
 
       const Template = {
         name: user.nome,
         email: user.email,
         trackingCode: data.trackingCode,
         productName: productNames,
-        logo: "https://project-recogreen.s3.amazonaws.com/logo-removebg-preview.png"
-      }
+        logo: 'https://project-recogreen.s3.amazonaws.com/logo-removebg-preview.png',
+      };
 
       await this.mailer.sendMail({
         to: `${user.email}`,
@@ -327,4 +330,6 @@ export class OrderService {
       throw new BadRequestException('não foi possivel deletar esse pedido.');
     }
   }
+
+ 
 }

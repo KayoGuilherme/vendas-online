@@ -12,6 +12,7 @@ import Stripe from 'stripe';
 type IProduto = {
   id_produto: number;
   amount: number;
+  price: number;
 };
 
 @Controller('')
@@ -27,22 +28,24 @@ export class WebhookController {
     });
   }
 
+  // Handler para o Webhook do Stripe
   @Post('payments/webhook')
   async handleWebhook(@Req() req: Request) {
     let event: Stripe.Event;
 
     try {
+      // Verificando a assinatura do webhook
       const sig = req.headers['stripe-signature'];
       const rawBody = req.body.toString();
-
       event = this.stripe.webhooks.constructEvent(
         rawBody,
         sig,
         String(process.env.STRIPE_WEBHOOK_SECRET),
       );
     } catch (err) {
+      console.error('Erro ao validar assinatura do webhook:', err);
       throw new BadRequestException(
-        'nao foi possivel pegar as informacoes para continuar com o evento',
+        'Falha ao verificar a assinatura do webhook',
       );
     }
 
@@ -50,55 +53,118 @@ export class WebhookController {
       if (event.type === 'checkout.session.completed') {
         const session = event.data.object as Stripe.Checkout.Session;
 
-        //Pego os dados via MetaDados enviados no apos o pagamento
-        const data = {
-          userId: Number(session.metadata.userId),
-          cart_Id: Number(session.metadata.cartId),
-          adressId: Number(session.metadata.adressId),
-        };
+        const { userId, cartId, adressId, productPrices, frete } =
+          this.extractSessionData(session);
 
-        //Verifico se esses dados foram enviados corretamente
-        if (!data.userId || !data.cart_Id || !data.adressId) {
-          throw new NotFoundException('Dados nao econtrados');
-        }
+        // Valida os dados necessários
+        this.validateOrderData(userId, cartId, adressId);
 
-        //Pego o preco dos produtos
-        const productPrices = JSON.parse(session.metadata.productPrices);
-        let totalProfit = 0;
-        productPrices.forEach((item) => {
-          totalProfit += item.price * item.amount;
-        });
+        // Calcula o lucro total
+        const totalProfit = this.calculateTotalProfit(productPrices);
 
-        //Atualizo o estoque dos produtos comprados fazendo um decremento
-        for (const product of productPrices) {
-          const { id_produto, amount } = product as IProduto;
+        // Atualiza o estoque dos produtos
+        await this.updateProductStock(productPrices);
 
-          await this.productService.updateStock(id_produto, amount);
-        }
+        // Cria o pedido
+        const order = await this.createOrder(userId, cartId, adressId);
 
-        if (isNaN(totalProfit) || totalProfit <= 0) {
-          throw new BadRequestException('Lucro total inválido');
-        }
+        // Move os produtos do carrinho para os itens do pedido
+        await this.moveProductsToOrder(cartId, order.id_order);
 
-        //Pego os precos dos produtos e mando para um total lucrado no banco de dados
-        const profit = await this.prisma.profit.create({
-          data: {
-            amount: totalProfit,
-          },
-        });
-
-        //Crio o pedido
-        await this.prisma.order.create({
-          data,
-        });
+        return { success: true, orderId: order.id_order, totalProfit };
       }
 
-      return { sucess: true };
-    } catch (e) {
-      console.log(e);
-      throw new BadRequestException(
-        'Não foi possivel capturar ação, erro interno do servidor.' + e,
-      );
+      throw new BadRequestException('Evento não reconhecido');
+    } catch (error) {
+      console.error('Erro ao processar evento do Stripe:', error);
+      throw new BadRequestException('Erro ao processar evento de pagamento');
     }
+  }
+
+  // Extrai os dados da sessão do Stripe
+  private extractSessionData(session: Stripe.Checkout.Session) {
+    const { userId, cartId, adressId, productPrices, frete } = session.metadata;
+
+    if (!userId || !cartId || !adressId || !productPrices || !frete) {
+      throw new NotFoundException('Dados faltando na sessão de pagamento');
+    }
+
+    return {
+      userId: Number(userId),
+      cartId: Number(cartId),
+      adressId: Number(adressId),
+      productPrices: JSON.parse(productPrices),
+      frete: Number(frete),
+    };
+  }
+
+  // Valida os dados essenciais para o pedido
+  private validateOrderData(userId: number, cartId: number, adressId: number) {
+    if (!userId || !cartId || !adressId) {
+      throw new NotFoundException('Dados obrigatórios não encontrados');
+    }
+  }
+
+  // Calcula o lucro total
+  private calculateTotalProfit(productPrices: IProduto[]): number {
+    let totalProfit = 0;
+    productPrices.forEach((item) => {
+      totalProfit += item.amount * item.price;
+    });
+    if (isNaN(totalProfit) || totalProfit <= 0) {
+      throw new BadRequestException('Lucro total inválido');
+    }
+    return totalProfit;
+  }
+
+  // Atualiza o estoque dos produtos comprados
+  private async updateProductStock(productPrices: IProduto[]) {
+    for (const product of productPrices) {
+      await this.productService.updateStock(product.id_produto, product.amount);
+    }
+  }
+
+  // Cria o pedido no banco de dados
+  private async createOrder(userId: number, cartId: number, adressId: number) {
+    return this.prisma.order.create({
+      data: {
+        userId,
+        cart_Id: cartId,
+        adressId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  // Move os produtos do carrinho para os itens do pedido
+  private async moveProductsToOrder(cartId: number, orderId: number) {
+    const cartProducts = await this.prisma.card_produtos.findMany({
+      where: { cartId },
+      include: {
+        produtos: true, 
+      },
+    });
+    
+    if (!cartProducts || cartProducts.length === 0) {
+      throw new NotFoundException('Carrinho está vazio.');
+    }
+
+    for (const product of cartProducts) {
+      await this.prisma.orderItem.create({
+        data: {
+          orderId,
+          produtoId: product.produtoId,
+          quantidade: product.amount,
+          preco: product.produtos.preco,
+          produtoNome: product.produtos.nome_produto,
+        },
+      });
+    }
+
+   
+    await this.prisma.card_produtos.deleteMany({
+      where: { cartId },
+    });
   }
 }
