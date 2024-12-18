@@ -80,7 +80,9 @@ model card_produtos {
   cartId    Int
   amount    Int
   produtoId Int
+  orderId   Int?
   Delivered Boolean? @default(false)
+  inCart    Boolean  @default(true)
   carrinho  cart     @relation(fields: [cartId], references: [id])
   produtos  Produtos @relation(fields: [produtoId], references: [id_produto])
   Order     Order[]

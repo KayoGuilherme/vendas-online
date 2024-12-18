@@ -163,8 +163,12 @@ export class WebhookController {
     }
 
    
-    await this.prisma.card_produtos.deleteMany({
-      where: { cartId },
+    await this.prisma.card_produtos.updateMany({
+      where: { cartId, inCart: true },  
+      data: {
+        inCart: false, 
+        orderId: orderId,  
+      },
     });
   }
 }
