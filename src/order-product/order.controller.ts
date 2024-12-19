@@ -62,4 +62,11 @@ export class OrderController {
   ) {
     return this.orderService.SendTrackingCode(data, userId);
   }
+
+
+  @Roles(Role.Admin)
+  @Get("by-session/:sessionId")
+  async getOrderPerSessionId(@Param("sessionId") sessionId: string) {
+    return this.orderService.getOrderBySession(sessionId);
+  }
 }

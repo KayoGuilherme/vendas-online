@@ -71,7 +71,7 @@ export class PaymentService {
       payment_method_types: ['card'],
       line_items,
       mode: 'payment',
-      success_url: 'https://yeshuaprofessional.vercel.app/pagamento-efetuado?order_id={ORDER_ID}',
+      success_url: `https://yeshuaprofessional.vercel.app/pagamento-efetuado?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: 'https://yeshuaprofessional.vercel.app/pagamento-erro',
       customer_creation: 'if_required',
       metadata: {

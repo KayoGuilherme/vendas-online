@@ -331,5 +331,24 @@ export class OrderService {
     }
   }
 
- 
+  async getOrderBySession(sessionId: string) {
+    const order = await this.prisma.order.findFirst({
+      where: { sessionId },
+      include: {
+        OrderItem: {
+          include: {
+            produto: true,
+          },
+        },
+        adress: true,
+        users: true,
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Pedido não encontrado.');
+    }
+
+    return order;
+  }
 }

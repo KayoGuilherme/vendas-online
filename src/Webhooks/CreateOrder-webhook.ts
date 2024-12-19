@@ -62,13 +62,12 @@ export class WebhookController {
         // Cria o pedido no banco de dados
         const order = await this.createOrder(userId, cartId, adressId);
 
-        const updatedSuccessUrl = session.success_url.replace('{ORDER_ID}', order.id_order.toString());
-
-        const successUrl = session.success_url.replace('{ORDER_ID}', order.id_order.toString());
-
-        return {
-          success_url: successUrl,
-        };
+        await this.prisma.order.update({
+          where: { id_order: order.id_order },
+          data: { sessionId: session.id },
+        });
+    
+        return { success: true };
     
       }
 
