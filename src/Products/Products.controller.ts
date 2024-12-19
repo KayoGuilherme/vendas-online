@@ -25,7 +25,7 @@ import { Paramid } from '../decorators/param-id.decorator';
 import { ParamId_produto } from '../decorators/param-id_produto.decorator';
 import { ParamProdutoId } from '../decorators/param-produtoId.decorator';
 
-@UseGuards(AuthGuard)
+
 @Controller('product')
 @ApiTags('Controle de Produtos')
 export class ProductController {
@@ -44,21 +44,21 @@ export class ProductController {
     return this.ProductService.getById(id);
   }
 
-  @UseGuards(RoleGuard)
+  @UseGuards(AuthGuard,RoleGuard)
   @Roles(Role.Admin)
   @Post('create')
   async createProduct(@Body() data: CreateProductDto) {
     return this.ProductService.create(data);
   }
 
-  @UseGuards(RoleGuard)
+  @UseGuards(AuthGuard,RoleGuard)
   @Roles(Role.Admin)
   @Put(':id')
   async updateProduct(@Body() data: UpdateProductDto, @Paramid() id) {
     return this.ProductService.update(id, data);
   }
 
-  @UseGuards(RoleGuard)
+  @UseGuards(AuthGuard,RoleGuard)
   @Roles(Role.Admin)
   @UseInterceptors(FileInterceptor('file'))
   @Post('Image/:produtoId')
@@ -71,7 +71,7 @@ export class ProductController {
     return this.FileService.uploadfiles(fileBuffer, fileName, produtoId);
   }
 
-  @UseGuards(RoleGuard)
+  @UseGuards(AuthGuard,RoleGuard)
   @Roles(Role.Admin)
   @Delete('Image/:fileName/:id')
   async deletePhotoProduct(
@@ -81,14 +81,14 @@ export class ProductController {
     return this.FileService.deleteFile(fileName, produtoId);
   }
 
-  @UseGuards(RoleGuard)
+  @UseGuards(AuthGuard,RoleGuard)
   @Roles(Role.Admin)
   @Delete(':id')
   async deleteProduct(@Paramid() id_produto: number) {
     return this.ProductService.delete(id_produto);
   }
 
-  @UseGuards(RoleGuard)
+  @UseGuards(AuthGuard,RoleGuard)
   @Roles(Role.Admin)
   @Patch(':id_produto')
   async updateStock(
@@ -98,7 +98,7 @@ export class ProductController {
     return this.ProductService.updateStock(Number(id_produto), quantity);
   }
 
-  @UseGuards(RoleGuard)
+  @UseGuards(AuthGuard,RoleGuard)
   @Get(':id_produto/delivery/:cep')
   async findPriceDelivery(
     @ParamId_produto() id_produto: number,

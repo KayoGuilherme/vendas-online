@@ -117,16 +117,59 @@ export class WebhookController {
   }
 
   // Cria o pedido na base de dados
-  private async createOrder(userId: number, cart_Id: number, adressId: number) {
-    return this.prisma.order.create({
-      data: {
-        userId,
-        cart_Id,
-        adressId,
+  // private async createOrder(userId: number, cart_Id: number, adressId: number) {
+  //   return this.prisma.order.create({
+  //     data: {
+  //       userId,
+  //       cart_Id,
+  //       adressId,
+  //     },
+  //   });
+  // }
+
+  private async createOrder(userId: number, cartId: number, adressId: number) {
+    const carrinho = await this.prisma.cart.findFirst({
+      where: { id: cartId, active: true },
+      include: {
+        carrinho: {
+          include: {
+            produtos: true, 
+          },
+        },
       },
     });
+  
+    if (!carrinho || carrinho.carrinho.length === 0) {
+      throw new NotFoundException('Carrinho vazio ou inexistente.');
+    }
+  
+    // Criação do pedido
+    const order = await this.prisma.order.create({
+      data: {
+        userId,
+        cart_Id: cartId,
+        adressId,
+        OrderItem: {
+          create: carrinho.carrinho.map((item) => ({
+            produtoId: item.produtoId,
+            quantidade: item.amount,
+            preco: item.produtos.preco, 
+          })),
+        },
+      },
+    });
+  
+  
+    await this.prisma.cart.update({
+      where: { id: cartId },
+      data: { active: false },
+    });
+  
+    return order;
   }
-
+  
+  
+  
   
   }
 
