@@ -56,7 +56,7 @@ export class PaymentService {
         currency: 'brl',
         product_data: {
           name: 'Frete',
-          description: `Entrega padrão}`,
+          description: `Entrega padrão`,
         },
         unit_amount: totalFrete * 100,
       },

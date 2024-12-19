@@ -334,14 +334,39 @@ export class OrderService {
   async getOrderBySession(sessionId: string) {
     const order = await this.prisma.order.findFirst({
       where: { sessionId },
-      include: {
+      select: {
+        id_order: true,
+        createdAt: true,
         OrderItem: {
-          include: {
-            produto: true,
+          select: {
+            quantidade: true,
+            preco: true,
+            produto: {
+              select: {
+                nome_produto: true,
+                imagem: true
+              },
+            },
           },
         },
-        adress: true,
-        users: true,
+        adress: {
+          select: {
+            Rua: true,
+            numero: true,
+            complemento: true,
+            bairro: true,
+            cidade: true,
+            estado: true,
+            CEP: true,
+          },
+        },
+        users: {
+          select: {
+            nome: true,
+            email: true,
+            CPF: true
+          },
+        },
       },
     });
 
