@@ -21,7 +21,6 @@ export class PaymentService {
     selectedAdressId: string,
     cepDestino: string,
   ) {
-  
     //Puxo as informacoes do carrinho baseado no usuario
     const cart = this.cartService.findCartByUserId(userId);
     //capturo os produtos dentro do carrinho
@@ -35,9 +34,7 @@ export class PaymentService {
     );
 
     //Pego o total do frete e envio no lineItems do checkout
-    const totalFrete = Number(
-      freteOptions[0][0][0].pcFinal.replace(',', '.')
-    );
+    const totalFrete = Number(freteOptions[0][0][0].pcFinal.replace(',', '.'));
 
     const line_items = produtos.map((item) => {
       const unitAmount = item.produtos.preco * 100;
@@ -74,7 +71,7 @@ export class PaymentService {
       payment_method_types: ['card'],
       line_items,
       mode: 'payment',
-      success_url: 'https://yeshuaprofessional.vercel.app/pagamento-efetuado',
+      success_url: 'https://yeshuaprofessional.vercel.app/pagamento-efetuado?order_id={ORDER_ID}',
       cancel_url: 'https://yeshuaprofessional.vercel.app/pagamento-erro',
       customer_creation: 'if_required',
       metadata: {
