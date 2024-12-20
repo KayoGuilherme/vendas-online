@@ -18,7 +18,8 @@ export class UpdateUserDto {
     
       @IsString()
       @MinLength(6)
-      @ApiProperty({ required: true })
+      @IsOptional()
+      @ApiProperty({ required: false })
       senha: string;
     
       @IsNotEmpty()
