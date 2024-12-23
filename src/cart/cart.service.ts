@@ -37,8 +37,7 @@ export class CartService {
     try {
       const cart = await this.prisma.cart.findFirst({
         where: {
-          userId,
-          active: true,
+          userId
         },
         include: {
           carrinho: {
@@ -46,6 +45,7 @@ export class CartService {
               amount: true,
               produtoId: true,
               cartId: true,
+              Delivered: true,
               id: true,
               produtos: {
                 select: {

@@ -344,7 +344,7 @@ export class OrderService {
             produto: {
               select: {
                 nome_produto: true,
-                imagem: true
+                imagem: true,
               },
             },
           },
@@ -364,7 +364,7 @@ export class OrderService {
           select: {
             nome: true,
             email: true,
-            CPF: true
+            CPF: true,
           },
         },
       },

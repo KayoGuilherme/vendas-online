@@ -74,38 +74,44 @@ export class UsersService {
     try {
       const usuarioExist = await this.prisma.users.findFirst({
         where: {
-          id: Number(id)
-        }
-      });
-
-      if (!usuarioExist)
-        throw new NotFoundException(`Esse Usuario do id:${id} não existe`);
-
-      const salt = await bcrypt.genSalt();
-
-      senha = await bcrypt.hash(senha, salt);
-
-      return this.prisma.users.update({
-        where: {
-          id: Number(id)
+          id: Number(id),
         },
-        data: {
-          email,
-          nome,
-          senha,
-          Telefone,
-          role,
-          genero,
-          CPF
-        }
+      });
+  
+      if (!usuarioExist) {
+        throw new NotFoundException(`Esse Usuario do id:${id} não existe`);
+      }
+  
+      const data: UpdateUserDto = {
+        email,
+        nome,
+        Telefone,
+        role,
+        genero,
+        CPF,
+        senha
+      };
+  
+      
+      if (senha) {
+        const salt = await bcrypt.genSalt();
+        data.senha = await bcrypt.hash(senha, salt);
+      }
+  
+      return await this.prisma.users.update({
+        where: {
+          id: Number(id),
+        },
+        data,
       });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       throw new BadRequestException(
-        "não foi possivel atualizar informações do usúario."
+        'não foi possivel atualizar informações do usúario.'
       );
     }
   }
+  
 
   async delete(id: number) {
     const usuarioExist = await this.prisma.users.findFirst({
