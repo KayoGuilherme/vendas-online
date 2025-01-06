@@ -13,6 +13,7 @@ async function bootstrap() {
     .setTitle('Vendas-online-api')
     .setDescription('aplicação em nestjs para api de um sistema de vendas')
     .setVersion('0.0.1')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

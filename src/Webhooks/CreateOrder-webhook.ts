@@ -6,7 +6,7 @@ import Stripe from 'stripe';
 type IProduto = {
   id_produto: number;
   amount: number;
-  price: number
+  price: number;
 };
 
 @Controller('')
@@ -22,13 +22,11 @@ export class WebhookController {
     });
   }
 
-  // Handler para o Webhook do Stripe
   @Post('payments/webhook')
   async handleWebhook(@Req() req: Request) {
     let event: Stripe.Event;
 
     try {
-      // Verificando a assinatura para garantir que o webhook é legítimo
       const sig = req.headers['stripe-signature'];
       const rawBody = req.body.toString();
       event = this.stripe.webhooks.constructEvent(
@@ -37,38 +35,41 @@ export class WebhookController {
         String(process.env.STRIPE_WEBHOOK_SECRET),
       );
     } catch (err) {
-      // Caso a assinatura não seja válida
       console.error('Erro ao validar assinatura do webhook', err);
       throw new BadRequestException('Falha ao verificar a assinatura do webhook');
     }
 
-    // Tratamento do evento específico
     try {
       if (event.type === 'checkout.session.completed') {
         const session = event.data.object as Stripe.Checkout.Session;
+        const { userId, cartId, adressId, selectedProducts } = this.extractSessionData(session);
 
-        // Pega os dados adicionais do evento (metadados enviados durante a criação do pagamento)
-        const { userId, cartId, adressId, productPrices, frete } = this.extractSessionData(session);
-
-        // Verifica se os dados necessários estão presentes
+        // 1. Validar os dados obrigatórios
         this.validateOrderData(userId, cartId, adressId);
 
-        // Calcula o lucro total dos produtos
-        const totalProfit = this.calculateTotalProfit(productPrices);
+        // 2. Calcular lucro total
+        const totalProfit = this.calculateTotalProfit(
+          selectedProducts.map((product) => ({
+            id_produto: product.produtoId,
+            amount: product.quantidade,
+            price: product.preco,
+          })),
+        );
+        console.log(`Lucro total da compra: ${totalProfit}`);
 
-        // Atualiza o estoque dos produtos comprados
-        await this.updateProductStock(productPrices);
+        // 3. Atualizar o estoque dos produtos comprados
+        await this.updateProductStock(
+          selectedProducts.map((product) => ({
+            id_produto: product.produtoId,
+            amount: product.quantidade,
+            price: product.preco,
+          })),
+        );
 
-        // Cria o pedido no banco de dados
-        const order = await this.createOrder(userId, cartId, adressId);
+        // 4. Criar a ordem no banco de dados
+        await this.createOrder(userId, cartId, adressId, selectedProducts);
 
-        await this.prisma.order.update({
-          where: { id_order: order.id_order },
-          data: { sessionId: session.id },
-        });
-    
         return { success: true };
-    
       }
 
       throw new BadRequestException('Evento não reconhecido');
@@ -78,11 +79,10 @@ export class WebhookController {
     }
   }
 
-  // Método para extrair e validar os dados da sessão de pagamento
   private extractSessionData(session: Stripe.Checkout.Session) {
-    const { userId, cartId, adressId, productPrices, frete } = session.metadata;
+    const { userId, cartId, adressId, selectedProducts } = session.metadata;
 
-    if (!userId || !cartId || !adressId || !productPrices || !frete) {
+    if (!userId || !cartId || !adressId || !selectedProducts) {
       throw new NotFoundException('Dados faltando na sessão de pagamento');
     }
 
@@ -90,8 +90,7 @@ export class WebhookController {
       userId: Number(userId),
       cartId: Number(cartId),
       adressId: Number(adressId),
-      productPrices: JSON.parse(productPrices),
-      frete: Number(frete),
+      selectedProducts: JSON.parse(selectedProducts), // Lista de { produtoId, quantidade, preco }
     };
   }
 
@@ -102,7 +101,7 @@ export class WebhookController {
     }
   }
 
-  // Calcula o lucro total com base nos preços dos produtos
+  // Calcula o lucro total com base nos produtos comprados
   private calculateTotalProfit(productPrices: IProduto[]): number {
     let totalProfit = 0;
     productPrices.forEach((item) => {
@@ -121,50 +120,56 @@ export class WebhookController {
     }
   }
 
-
-  private async createOrder(userId: number, cartId: number, adressId: number) {
+  // Cria o pedido e registra os produtos comprados
+  private async createOrder(userId: number, cartId: number, adressId: number, selectedProducts: { produtoId: number, quantidade: number }[]) {
     const carrinho = await this.prisma.cart.findFirst({
       where: { id: cartId, active: true },
       include: {
         carrinho: {
-          include: {
-            produtos: true, 
-          },
+          include: { produtos: true }, // Inclui os detalhes dos produtos
         },
       },
     });
-  
+
     if (!carrinho || carrinho.carrinho.length === 0) {
       throw new NotFoundException('Carrinho vazio ou inexistente.');
     }
-  
-    // Criação do pedido
+
+    // Filtrar os produtos comprados
+    const produtosComprados = carrinho.carrinho.filter((item) =>
+      selectedProducts.some((selected) => selected.produtoId === item.produtoId),
+    );
+
+    if (produtosComprados.length === 0) {
+      throw new BadRequestException('Nenhum produto válido selecionado para compra.');
+    }
+
+    // Criar a ordem
     const order = await this.prisma.order.create({
       data: {
         userId,
         cart_Id: cartId,
         adressId,
         OrderItem: {
-          create: carrinho.carrinho.map((item) => ({
-            produtoId: item.produtoId,
-            quantidade: item.amount,
-            preco: item.produtos.preco, 
-          })),
+          create: produtosComprados.map((item) => {
+            const selected = selectedProducts.find((p) => p.produtoId === item.produtoId);
+            return {
+              produtoId: item.produtoId,
+              quantidade: selected.quantidade,
+              preco: item.produtos.preco,
+            };
+          }),
         },
       },
     });
-  
-  
-    await this.prisma.cart.update({
-      where: { id: cartId },
-      data: { active: false },
-    });
-  
+
+    // Remover os produtos comprados do carrinho
+    for (const item of produtosComprados) {
+      await this.prisma.card_produtos.delete({
+        where: { id: item.id },
+      });
+    }
+
     return order;
   }
-  
-  
-  
-  
-  }
-
+}
