@@ -21,63 +21,67 @@ export class WebhookController {
       apiVersion: '2023-10-16',
     });
   }
-
+ 
   @Post('payments/webhook')
-  async handleWebhook(@Req() req: Request) {
-    let event: Stripe.Event;
+async handleWebhook(@Req() req: Request) {
+  let event: Stripe.Event;
 
-    try {
-      const sig = req.headers['stripe-signature'];
-      const rawBody = req.body.toString();
-      event = this.stripe.webhooks.constructEvent(
-        rawBody,
-        sig,
-        String(process.env.STRIPE_WEBHOOK_SECRET),
-      );
-    } catch (err) {
-      console.error('Erro ao validar assinatura do webhook', err);
-      throw new BadRequestException('Falha ao verificar a assinatura do webhook');
-    }
-
-    try {
-      if (event.type === 'checkout.session.completed') {
-        const session = event.data.object as Stripe.Checkout.Session;
-        const { userId, cartId, adressId, selectedProducts } = this.extractSessionData(session);
-
-        // 1. Validar os dados obrigatórios
-        this.validateOrderData(userId, cartId, adressId);
-
-        // 2. Calcular lucro total
-        const totalProfit = this.calculateTotalProfit(
-          selectedProducts.map((product) => ({
-            id_produto: product.produtoId,
-            amount: product.quantidade,
-            price: product.preco,
-          })),
-        );
-        console.log(`Lucro total da compra: ${totalProfit}`);
-
-        // 3. Atualizar o estoque dos produtos comprados
-        await this.updateProductStock(
-          selectedProducts.map((product) => ({
-            id_produto: product.produtoId,
-            amount: product.quantidade,
-            price: product.preco,
-          })),
-        );
-
-        // 4. Criar a ordem no banco de dados
-        await this.createOrder(userId, cartId, adressId, selectedProducts);
-
-        return { success: true };
-      }
-
-      throw new BadRequestException('Evento não reconhecido');
-    } catch (e) {
-      console.error('Erro ao processar evento do Stripe:', e);
-      throw new BadRequestException('Erro ao processar evento de pagamento');
-    }
+  try {
+    const sig = req.headers['stripe-signature'];
+    const rawBody = req.body.toString();
+    event = this.stripe.webhooks.constructEvent(
+      rawBody,
+      sig,
+      String(process.env.STRIPE_WEBHOOK_SECRET),
+    );
+  } catch (err) {
+    console.error('Erro ao validar assinatura do webhook:', err);
+    throw new BadRequestException('Falha ao verificar a assinatura do webhook');
   }
+
+  try {
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const { userId, cartId, adressId, selectedProducts } = this.extractSessionData(session);
+
+      // Valida os dados essenciais da sessão
+      this.validateOrderData(userId, cartId, adressId);
+
+      // Calcula lucro total
+      const totalProfit = this.calculateTotalProfit(
+        selectedProducts.map((product) => ({
+          id_produto: product.produtoId,
+          amount: product.quantidade,
+          price: product.preco,
+        })),
+      );
+
+      console.log(`Lucro total: ${totalProfit}`);
+
+      // Atualiza estoque
+      await this.updateProductStock(
+        selectedProducts.map((product) => ({
+          id_produto: product.produtoId,
+          amount: product.quantidade,
+          price: product.preco,
+        })),
+      );
+
+      // Cria o pedido no banco de dados
+      await this.createOrder(userId, cartId, adressId, selectedProducts);
+
+      return { success: true };
+    }
+
+    throw new BadRequestException('Evento não reconhecido');
+  } catch (e) {
+    console.error('Erro ao processar evento do Stripe:', e);
+    throw new BadRequestException('Erro ao processar evento de pagamento');
+  }
+}
+
+
+
 
   private extractSessionData(session: Stripe.Checkout.Session) {
     const { userId, cartId, adressId, selectedProducts } = session.metadata;
@@ -126,25 +130,25 @@ export class WebhookController {
       where: { id: cartId, active: true },
       include: {
         carrinho: {
-          include: { produtos: true }, // Inclui os detalhes dos produtos
+          include: { produtos: true },
         },
       },
     });
-
+  
     if (!carrinho || carrinho.carrinho.length === 0) {
       throw new NotFoundException('Carrinho vazio ou inexistente.');
     }
-
-    // Filtrar os produtos comprados
+  
+    // Filtra os produtos comprados
     const produtosComprados = carrinho.carrinho.filter((item) =>
       selectedProducts.some((selected) => selected.produtoId === item.produtoId),
     );
-
+  
     if (produtosComprados.length === 0) {
       throw new BadRequestException('Nenhum produto válido selecionado para compra.');
     }
-
-    // Criar a ordem
+  
+    // Cria o pedido
     const order = await this.prisma.order.create({
       data: {
         userId,
@@ -162,14 +166,15 @@ export class WebhookController {
         },
       },
     });
-
-    // Remover os produtos comprados do carrinho
+  
+    // Marca os itens comprados no carrinho como isPurchased = true
     for (const item of produtosComprados) {
-      await this.prisma.card_produtos.delete({
+      await this.prisma.card_produtos.update({
         where: { id: item.id },
+        data: { isPurchased: true },
       });
     }
-
+  
     return order;
   }
 }

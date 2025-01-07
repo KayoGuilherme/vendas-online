@@ -26,6 +26,8 @@ export class PaymentService {
     //capturo os produtos dentro do carrinho
     const produtos = (await cart).carrinho;
 
+    console.log("😡😡😡😡🤬🤬🤬🤬🤬🤬🤬😡😡😡😡" + produtos[0].produtos)
+
     //capturo o frete de entrega para somar com os produtos
     const freteOptions = await Promise.all(
       produtos.map((p) =>
@@ -50,6 +52,8 @@ export class PaymentService {
         quantity: item.amount,
       };
     });
+
+    console.log( "😢😢😢😢😢😢" + line_items[0].quantity)
 
     line_items.push({
       price_data: {

@@ -18,20 +18,32 @@ export class CartService {
   ) {}
 
   async clearCart(userId: number) {
-    const cart = this.findCartByUserId(userId);
-
-    await this.prisma.cart.updateMany({
-      data: {
-        ...cart,
-        active: false,
+    // Buscar o carrinho do usuário
+    const cart = await this.findCartByUserId(userId);
+  
+    if (!cart) {
+      throw new Error('Carrinho não encontrado');
+    }
+  
+    // Excluir todos os itens da tabela `card_produtos` relacionados ao carrinho
+    await this.prisma.card_produtos.deleteMany({
+      where: {
+        cartId: cart.id,
       },
     });
-
+  
+    // Opcional: Marcar o carrinho como inativo
+    await this.prisma.cart.update({
+      where: { id: cart.id },
+      data: { active: false },
+    });
+  
     return {
-      row: [],
-      affected: LINE_AFFECTED,
+      message: 'Carrinho limpo com sucesso!',
+      affectedCart: cart.id,
     };
   }
+  
 
   async findCartByUserId(userId: number) {
     try {

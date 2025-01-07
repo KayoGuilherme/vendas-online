@@ -34,6 +34,8 @@ export class ProductController {
     private readonly FileService: FileService,
   ) {}
 
+
+  
   @Get()
   async getProduct() {
     return this.ProductService.get();
